@@ -7,6 +7,9 @@
   <a href="#-网盘下载与分享须知">
     <img src="https://img.shields.io/badge/Status-%E5%85%A8%E9%80%9F%E7%9B%B4%E9%93%BE-0077ff?style=for-the-badge" alt="Status">
   </a>
+  <a href="#你的占位目标锚点或链接">
+    <img src="https://img.shields.io/badge/%E8%B7%B3%E8%BD%AC-%E5%8D%A0%E4%BD%8D%E9%93%BE%E6%8E%A5-green?style=for-the-badge" alt="Placeholder">
+  </a>
 </p>
 
 <p align="center">
