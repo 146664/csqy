@@ -1,9 +1,6 @@
 # 🎮 CS:S 主题公益站 & 综合网盘分享 · 用户指南
 
 <p align="center">
-  <a href=" ">
-    < img src="https://img.shields.io/badge/AList-公益镜像站-44cc11?style=for-the-badge&logo=ghost" alt="AList">
-  </a >
   <a href="#1-css-游戏专区反恐精英起源">
     < img src="https://img.shields.io/badge/CS:S-玩家社区-ff6600?style=for-the-badge&logo=counter-strike" alt="CSS">
   </a >
