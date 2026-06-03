@@ -66,7 +66,7 @@
 
 本站的建设与维护离不开以下伙伴的大力支持，感谢每一位为社区生态做出贡献的你：（排名不分先后）
 
-* 💻 **技术支持**：感谢 `AList` 开源项目的开发者们，以及为本站提供服务器赞助/CDN加速的爱心伙伴。
+* 💻 **技术支持**：感谢 `AList` 开源项目的开发者们，<b>主要引用：</b>git【<a href="https://github.com/TheSmallHanCat/Better_Alist" target="_blank" style="color: #66CCFF !important; text-decoration: underline !important;">Better_Alist</a>】和网络.AI辅助。
 * 🗺️ **地图/MOD 投稿者**：@玩家A、@玩家B、@社区某老兵（*此处可替换为实际投稿人的ID*）——感谢你们分享珍藏多年的绝版资源！
 * 🛡️ **社区管理员**：感谢所有在QQ群和Discord维护日常秩序、耐心解答萌新疑问的兄弟们。
 * 👥 **全体玩家**：感谢每一位遵守下载规范、良性刷流、热爱 CS:S 的普通玩家。**你们的访问，就是本站坚持下去的动力！**
