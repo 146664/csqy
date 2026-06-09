@@ -1,0 +1,262 @@
+<script src="https://unpkg.com/oh-my-live2d"></script>
+<script src="https://cdn.jsdelivr.net/gh/TheSmallHanCat/Better_Alist@main/jq.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/TheSmallHanCat/Better_Alist@main/js/lib.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/TheSmallHanCat/Better_Alist@main/js/parallax.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/TheSmallHanCat/Better_Alist@main/js/app.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/TheSmallHanCat/Better_Alist@main/fish.js"></script>
+<script src="https://npm.elemecdn.com/granim@2.0.0/dist/granim.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<style>
+    /* 核心：强行固定在网页最底部的容器 */
+    #customize {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        z-index: 999999 !important; /* 确保在最上层 */
+        background: rgba(255, 255, 255, 0.15) !important; /* 半透明背景 */
+        backdrop-filter: blur(10px) !important; /* 毛玻璃模糊效果 */
+        -webkit-backdrop-filter: blur(10px) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+        padding: 10px 0 !important;
+        box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* 展示区域的样式 */
+    .editable-zone {
+        transition: background 0.3s;
+        padding: 5px 20px;
+        border-radius: 6px;
+        display: inline-block;
+        max-width: 90%;
+    }
+    
+    /* 配合底部固定，给页面最下方留出空白，防止挡住原本的最底端内容 */
+    body {
+        padding-bottom: 120px !important;
+    }
+</style>
+
+<div class="st-Container">
+    <a style="display:none" class="st-Menu closed" id="st-Menu" href="#"></a>
+</div>
+<div class="sw-Hennnyano" id="sw-Hennnyano">
+    <div class="layer body w100" data-depth="0.1"></div>
+    <div class="layer eyes w100" data-depth="0.2"></div>
+</div>
+<div id="jsi-flying-fish-container" class="fish-container"></div>
+
+<div id="customize" style="display: none;">
+    <center class="dibu">
+        <div class="editable-zone">
+            <div style="line-height: 20px; font-size: 9pt; font-weight: bold;">
+                <span>" <span style="color: rgb(13, 109, 252); font-weight: bold;" id="hitokoto"><a href="#" id="hitokoto_text">"已经无所畏惧了，因为我已经不是孤身一人了."</a></span> "</span>
+                <p style="margin-left: 10rem; font-size: 8pt;"><small></small></p>
+            </div>
+
+            <div style="font-size: 13px; font-weight: bold; margin-top: 5px;">
+                <p style="text-align: center; margin: 3px 0;" id="welcome"></p>
+                <p style="text-align: center; margin: 3px 0;">本站已稳定运行 <span id="runtime" style="color: #409EFF;"></span></p>
+            </div>
+        </div>
+
+        <div style="font-size: 12px; font-weight: bold; margin-top: 5px;">
+            <span class="nav-item">
+                <a class="nav-link" href="/@manage" target="_blank" style="text-decoration: none;">
+                    <i class="fa-solid fa-folder-gear" style="color:#409EFF;" aria-hidden="true"></i> 管理
+                </a>
+            </span>
+        </div>
+    </center>
+    <script src="https://v1.hitokoto.cn/?encode=js&select=%23hitokoto" defer></script>
+</div>
+
+<script>
+    // 1. 安全初始化 Live2D 看板娘
+    try {
+        if (typeof OML2D !== 'undefined') {
+            OML2D.loadOml2d({
+                parentElement: document.body,
+                models: [
+                    {
+                        path: '/d/%E6%B5%8B%E8%AF%95%E5%86%85%E5%AE%B9/my-live2d-web/models/my_avatar/model.model3.json', 
+                        position: [0, 80],     
+                        scale: 0.11,              
+                        stageStyle: { width: 350, height: 450 }
+                    }
+                ],
+                tips: { style: { backgroundColor: 'rgba(0, 0, 0, 0.7)', textColor: '#fff' } }
+            });
+        }
+    } catch(e) { console.warn("Live2D 载入发生异常：", e); }
+
+    // 底栏检测定时器
+    (function() {
+        let retryCount = 0;
+        const maxRetries = 50;
+        const interval = setInterval(() => {
+            retryCount++;
+            if (document.querySelector(".footer") || retryCount >= maxRetries) {
+                const customizeEl = document.querySelector("#customize");
+                if (customizeEl) customizeEl.style.display = "";
+                clearInterval(interval);
+            }
+        }, 200);
+    })();
+
+    // 动态网站运行时间计算
+    function updateRuntime() {
+        const XProgress = new Date("2026/06/01 10:00:00"); 
+        const XToday = new Date();
+        const diff = XToday - XProgress;
+        
+        if (diff < 0) {
+            document.getElementById("runtime").innerHTML = "准备启航中...";
+            return;
+        }
+        
+        const XDaysRound = Math.floor(diff / 1000 / 60 / 60 / 24);
+        const XHoursRound = Math.floor((diff / 1000 / 60 / 60) % 24);
+        const XMinutesRound = Math.floor((diff / 1000 / 60) % 60);
+        const XSecondsRound = Math.floor((diff / 1000) % 60);
+        
+        const runtimeEl = document.getElementById("runtime");
+        // 移除了编辑判断，直接安全刷新时间
+        if (runtimeEl) {
+            runtimeEl.innerHTML = XDaysRound + " 天 " + XHoursRound + " 时 " + XMinutesRound + " 分 " + XSecondsRound + " 秒";
+        }
+    }
+    setInterval(updateRuntime, 1000);
+
+    // 智能时间段欢迎语
+    (function() {
+        const hour = new Date().getHours();
+        let welcomeText = "欢迎光临本站！";
+        if (hour < 6) { welcomeText = "🌟 个人熬夜伤身，早点休息哦！"; }
+        else if (hour < 12) { welcomeText = "☀️ 早上好！新的一天充满活力！"; }
+        else if (hour < 18) { welcomeText = "🌤️ 下午好！喝杯茶歇一歇吧！"; }
+        else { welcomeText = "🌙 晚上好！享受舒适的静谧时光！"; }
+        const welcomeEl = document.getElementById("welcome");
+        if(welcomeEl) welcomeEl.innerHTML = welcomeText;
+    })();
+
+    // 渐变背景初始化
+    if (document.getElementById('canvas-basic') && typeof Granim !== 'undefined') {
+        var granimInstance = new Granim({
+            element: '#canvas-basic',
+            direction: 'left-right',
+            isPausedWhenNotInView: true,
+            states : {
+                "default-state": {
+                    gradients: [
+                        ['#a18cd1', '#fbc2eb'],
+                        ['#fff1eb', '#ace0f9'],
+                        ['#d4fc79', '#96e6a1'],
+                        ['#a1c4fd', '#c2e9fb'],
+                        ['#a8edea', '#fed6e3'],
+                        ['#9890e3', '#b1f4cf']
+                    ]
+                }
+            }
+        });
+    }
+
+    // 网页鼠标点击特效
+    (function () {
+        var a_idx = 0;
+        window.onclick = function (event) {
+            var a = ["❤富强❤", "❤民主❤", "❤文明❤", "❤和谐❤", "❤自由❤", "❤平等❤", "❤公正❤", "❤法治❤", "❤爱国❤", "❤敬业❤", "❤诚信❤", "❤友善❤"];
+            var heart = document.createElement("b");
+            heart.onselectstart = new Function('event.returnValue=false');
+
+            document.body.appendChild(heart).innerHTML = a[a_idx];
+            a_idx = (a_idx + 1) % a.length;
+            heart.style.cssText = "position: fixed; left:-100%;";
+
+            var f = 13,
+                x = event.clientX - f / 2 - 30,
+                y = event.clientY - f,
+                c = randomColor(),
+                opacity = 1,
+                scale = 0.8;
+
+            var timer = setInterval(function () {
+                if (opacity <= 0) {
+                    if(heart.parentNode) document.body.removeChild(heart);
+                    clearInterval(timer);
+                } else {
+                    heart.style.cssText = "font-size:16px; cursor: default; position: fixed; color:" +
+                        c + "; left:" + x + "px; top:" + y + "px; opacity:" + opacity + "; transform:scale(" +
+                        scale + "); z-index: 99999;";
+                    y--;
+                    opacity -= 0.016;
+                    scale += 0.002;
+                }
+            }, 15);
+        };
+        function randomColor() {
+            return "rgb(" + (~~(Math.random() * 255)) + "," + (~~(Math.random() * 255)) + "," + (~~(Math.random() * 255)) + ")";
+        }
+    })();
+
+    // 全屏公告
+    window.addEventListener('DOMContentLoaded', () => {
+        const NOTICE_VERSION = '202606_v1'; 
+        if (localStorage.getItem('alist_notice_read_version') === NOTICE_VERSION) {
+            return; 
+        }
+
+        const mask = document.createElement('div');
+        mask.style.cssText = `
+            position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important;
+            background: rgba(10, 10, 25, 0.88) !important; backdrop-filter: blur(15px) !important; -webkit-backdrop-filter: blur(15px) !important;
+            z-index: 2147483647 !important; display: flex !important; justify-content: center !important; align-items: center !important;
+            opacity: 1 !important; transition: opacity 0.4s ease !important;
+        `;
+
+        const card = document.createElement('div');
+        card.style.cssText = `
+            background: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            padding: 35px 25px !important; border-radius: 16px !important; max-width: 480px !important; width: 85% !important;
+            text-align: center !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important; box-sizing: border-box !important;
+        `;
+
+        card.innerHTML = `
+            <h2 style="color: #66CCFF !important; margin: 0 0 15px 0 !important; font-size: 22px !important; letter-spacing: 2px !important; font-family: sans-serif !important;">
+                📢 访问须知
+            </h2>
+            <div style="border-top: 1px solid rgba(255,255,255,0.15) !important; margin-bottom: 15px !important;"></div>
+            <div style="color: #E0E0FF !important; font-size: 14px !important; line-height: 1.8 !important; text-align: left !important; margin-bottom: 25px !important; font-family: sans-serif !important;">
+                <p style="margin: 8px 0 !important; color: #FF9999 !important; font-weight: bold;">✨ 请看完公告谢谢！：</p>
+                <p style="margin: 8px 0 !important;">1. 🪐 <b>主要说明：</b>先使用测试内容。</p>
+                <p style="margin: 8px 0 !important;">2. 🔍 <b>群组号码：</b>QQ群【577432856】 dis【<a href="https://discord.gg/22ZXS57jT" target="_blank" style="color: #FF9999 !important; text-decoration: underline !important;">点击加入Discord</a>】。</p>
+                <p style="margin: 8px 0 !important;">3. 🛑 <b>使用守则：</b>本站仅供个人学习，请勿恶意刷流。资源主要来自于网络。</p>
+                <p style="margin: 12px 0 0 0 !important; text-align: center !important;">
+                    🔗 <a href="https://github.com/146664/csqy" target="_blank" style="color: #66CCFF !important; text-decoration: underline !important; font-weight: bold;">查看更多详细说明</a>
+                </p>
+            </div>
+        `;
+
+        const btn = document.createElement('button');
+        btn.innerText = '我知道了 · 进入网盘';
+        btn.style.cssText = `
+            background: linear-gradient(135deg, #66CCFF, #FF9999) !important; color: white !important; border: none !important;
+            padding: 10px 30px !important; font-size: 15px !important; font-weight: bold !important; border-radius: 25px !important;
+            cursor: pointer !important; box-shadow: 0 4px 15px rgba(102, 204, 255, 0.4) !important; transition: transform 0.2s !important;
+        `;
+        
+        btn.onmouseover = () => btn.style.transform = 'scale(1.05)';
+        btn.onmouseout = () => btn.style.transform = 'scale(1)';
+
+        btn.onclick = () => {
+            mask.style.opacity = '0';
+            localStorage.setItem('alist_notice_read_version', NOTICE_VERSION);
+            setTimeout(() => mask.remove(), 400);
+        };
+
+        card.appendChild(btn);
+        mask.appendChild(card);
+        document.body.appendChild(mask);
+    });
+</script>
